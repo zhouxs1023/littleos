@@ -1,0 +1,38 @@
+# Makefile for LittleOS by Lacroix Pascal
+# to make binaries, type: make
+# to make a boot disk, type: make disk
+#
+
+TOPDIR= c:/LittleOS
+DOS_TOPDIR= c:\LittleOS
+
+all: lib kernel boot install
+
+
+lib: dummy
+	$(MAKE) -C lib
+
+kernel: dummy
+	$(MAKE) -C kernel
+
+boot: dummy
+	$(MAKE) -C boot
+
+install: dummy
+	$(MAKE) -C boot install
+
+clean:
+	$(MAKE) -C lib clean
+	$(MAKE) -C boot clean
+	$(MAKE) -C kernel clean
+
+dist: all
+	@echo Deleting backup files (*.BAK) and objects file (*.O)...
+	whereis .\*.bak [DEL &2]
+	whereis .\*.o [DEL &2]
+	@echo Creating ZIP archive...
+	pkzip -r -p LittleOS.ZIP *.*
+	@echo Deleting unneeded files from archive
+	pkzip -d LittleOS.ZIP *.o *.gpr *.gdt
+
+dummy:

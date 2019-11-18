@@ -1,0 +1,27 @@
+What's new in 0.1d:
+-------------------
+* A "good" paging system: all memory is now mapped (high memory)
+* Page allocation functions
+* kmalloc and kfree functions (seem to work fine, but not really tested)
+* time and date functions (but don't currently work)
+
+What's new in 0.1c:
+-------------------
+* Drivers from Eran: keyboard, mouse and serial, lpt, fd...
+* Begin of paging system
+
+What's new in 0.1b:
+-------------------
+*  This boot sector has been deleted from the archive, because now we only use load.com under DOS.
+The boot sector will be done later.
+*  There is now a simple logo when you start the OS.
+*  Cameron sent me the new loader: load.com (see in boot/load). This loader
+is more performant and can load big files. Now, you'll need this to start the
+OS (just go to directory bin and type `load').
+
+
+What is to do (first) ?
+----------------------
+*  the Multitasking system (first cooperative then later preemptive)
+*  more drivers (floppy and hard drives...)
+

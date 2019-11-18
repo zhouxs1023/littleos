@@ -1,0 +1,12 @@
+all: libc.a
+
+OBJS= ctype.o vsprintf.o random.o strtol.o strtoul.o time.o
+
+CFLAGS=-O4 -nostdinc -fno-builtin -fomit-frame-pointer -I../include
+
+libc.a: $(OBJS)
+	ar rsc libc.a $(OBJS)
+
+clean:
+	del *.o
+	del libc.a

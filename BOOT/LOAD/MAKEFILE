@@ -1,0 +1,10 @@
+all: load
+
+load: load.asm a20.inc gdtnasm.inc idtnasm.inc
+	nasm -fbin -o load.com load.asm
+
+install: load
+	update load.com ../../bin/load.com
+
+clean:
+	del load.com

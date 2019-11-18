@@ -1,0 +1,14 @@
+# Makefile for loader(s)
+
+all: load
+
+load: dummy
+	$(MAKE) -C load
+
+install:
+	$(MAKE) -C load install
+
+clean:
+	$(MAKE) -C load clean
+
+dummy:

@@ -1,0 +1,104 @@
+# Makefile for LittleOS kernel
+
+CFLAGS=-O4 -nostdinc -I../include -DDEBUG -fno-builtin -fomit-frame-pointer
+
+all: kernel.32 install
+
+.c.o:
+	gcc -c $(CFLAGS) $<
+
+OBJS= start.o main.o asm.o console.o physmem.o seg.o pic.o pit.o \
+	paging.o int.o traps.o timer.o keyboard.o irq.o cpu.o \
+        io.o fd.o mouse.o serial.o lpt.o shell.o kmalloc.o
+
+asm.o: asm.asm
+	nasm -fcoff asm.asm
+
+int.o: int.asm
+	cpp -I../include -nostdinc int.asm > int.as2
+	nasm -fcoff int.as2
+	rm int.as2
+
+start.o: start.asm
+	nasm -fcoff start.asm
+
+kernel.o: $(OBJS) ../lib/libc.a
+	ld -T kernel.ld -Map kernel.map -nostdlib -Ttext 0 -o kernel.o $(OBJS) \
+        	../lib/libc.a
+	nm kernel.o --numeric-sort --extern-only > kernel
+
+kernel.32: kernel.o
+	objcopy -I coff-go32 -O binary kernel.o kernel.32
+
+install: dummy
+	update kernel.32 ../bin/kernel.32
+
+depend:
+	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
+	gcc -M -I../include *.c >> tmp_make
+	cp tmp_make Makefile
+
+clean:
+	del *.o
+	del kernel.32
+	del kernel.map
+	del kernel.
+
+dummy:
+
+### Dependencies:
+console.o: console.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h \
+ ../include/stdarg.h ../include/string.h logo.h
+cpu.o: cpu.c ../include/string.h ../include/pio.h
+fd.o: fd.c ../include/kernel.h ../include/types.h ../include/gdt.h \
+ ../include/isa.h ../include/../version.h ../include/pio.h \
+ ../include/seg.h ../include/flags.h
+io.o: io.c ../include/kernel.h ../include/types.h ../include/gdt.h \
+ ../include/isa.h ../include/../version.h ../include/pio.h \
+ ../include/seg.h ../include/flags.h ../include/string.h
+irq.o: irq.c ../include/kernel.h ../include/types.h ../include/gdt.h \
+ ../include/isa.h ../include/../version.h ../include/pio.h \
+ ../include/seg.h ../include/flags.h ../include/string.h
+keyboard.o: keyboard.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h \
+ ../include/string.h
+main.o: main.c ../include/kernel.h ../include/types.h ../include/gdt.h \
+ ../include/isa.h ../include/../version.h ../include/pio.h \
+ ../include/seg.h ../include/flags.h ../include/stdarg.h ../version.h
+memory.o: memory.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h \
+ ../include/paging.h ../include/string.h ../include/bitops.h
+mouse.o: mouse.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h
+paging.o: paging.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h \
+ ../include/paging.h
+pic.o: pic.c ../include/kernel.h ../include/types.h ../include/gdt.h \
+ ../include/isa.h ../include/../version.h ../include/pio.h \
+ ../include/seg.h ../include/flags.h
+pit.o: pit.c ../include/kernel.h ../include/types.h ../include/gdt.h \
+ ../include/isa.h ../include/../version.h ../include/pio.h \
+ ../include/seg.h ../include/flags.h
+seg.o: seg.c ../include/kernel.h ../include/types.h ../include/gdt.h \
+ ../include/isa.h ../include/../version.h ../include/pio.h \
+ ../include/seg.h ../include/flags.h
+serial.o: serial.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h
+shell.o: shell.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h \
+ ../include/stdarg.h ../include/string.h ../version.h
+timer.o: timer.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h
+traps.o: traps.c ../include/kernel.h ../include/types.h \
+ ../include/gdt.h ../include/isa.h ../include/../version.h \
+ ../include/pio.h ../include/seg.h ../include/flags.h \
+ ../include/traps.h
